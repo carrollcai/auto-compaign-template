@@ -1,7 +1,8 @@
 import $ from 'jquery';
-
+console.log(123);
+console.log(234);
 $(() => {
   $('body').append(`
-    <p>1222222</p>
+    <p>12222222222</p>
   `);
 });

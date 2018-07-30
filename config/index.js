@@ -12,6 +12,10 @@ module.exports = {
     useEslint: true,
     poll: false,
     autoOpenBrowser: true,
+    errorOverlay: true,
+    // 让错误信息显示到浏览器上
+    useEslint: true,
+    showEslintErrorsInOverlay: false
   },
   build: {
     // Template for index.html

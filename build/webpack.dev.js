@@ -7,6 +7,7 @@
 
 const config = require('../config');
 const path = require('path');
+const fs = require('fs');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const baseWebpackConfig = require('./webpack.base.js');
@@ -31,15 +32,15 @@ if (!files.includes(process.env.NAME)) {
 }
 
 const devWebpackConfig = merge(baseWebpackConfig, {
-  context: path.resolve(__dirname, '../'),
   entry: {
-    app: `./src/modules/${process.env.NAME}/app.js`
+    app: path.resolve(__dirname, `../src/modules/${process.env.NAME}/app.js`)
   },
   output: {
-    path: path.resolve(__dirname, `./src/modules/${process.env.NAME}`),
+    path: path.resolve(__dirname, `../src/modules/${process.env.NAME}`),
     filename: '[name].js',
   },
   devServer: {
+    clientLogLevel: 'warning',
     hot: true,
     contentBase: false, // since we use CopyWebpackPlugin.
     compress: true,
@@ -47,9 +48,13 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     port: PORT || config.dev.port,
     publicPath: config.dev.assetsPublicPath,
     proxy: config.dev.proxyTable,
+    overlay: config.dev.errorOverlay
+      ? { warnings: false, errors: true }
+      : false,
   },
   module: {
     rules: [
+      // 正确解析js和css文件
       {
         test: /\.js$/,
         loader: 'babel-loader',
@@ -59,6 +64,18 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         test: /\.css$/,
         loader: 'style-loader!css-loader'
       },
+      // 对js文件进行eslint校验，并把错误信息输入到浏览器上
+      {
+        test: /\.js$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src')],
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+          // 是否将错误输出到浏览器页面上
+          emitWarning: !config.dev.showEslintErrorsInOverlay
+        }
+      }
     ]
   },
   plugins: [
@@ -66,9 +83,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: `./src/modules/${process.env.NAME}/index.html`,
       template: `./src/modules/${process.env.NAME}/index.html`,
-      // inject: true
-      inject: 'body',
-      // chunks
+      inject: 'body'
     }),
   ]
 });

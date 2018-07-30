@@ -15,7 +15,7 @@ NAME="filename" npm run init
 ```
 NAME="filename" npm run dev
 ```
-- start webpack-dev-middleware
+- start webpack-dev-server
 - set proxy
 
 ### build
