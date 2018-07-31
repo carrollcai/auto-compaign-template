@@ -2,7 +2,7 @@
  * @author carroll
  * @since 20180723
  * @example NAME="filename" npm run build
- * @description 打包文件在dist/"filename"下，实现功能es5转es6，打包压缩文件。
+ * @description 打包文件在dist/"filename"下，实现功能es6转es5，打包压缩文件。
 */
 
 const baseWebpackConfig = require('./webpack.base.js');
@@ -11,10 +11,10 @@ const webpack = require('webpack');
 const config = require('../config');
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const fs = require('fs');
+const utils = require('./utils.js');
 
 const modulesPath = path.resolve(__dirname, '../src/modules');
 const files = fs.readdirSync(modulesPath);
@@ -33,7 +33,7 @@ function assetsPath(_path) {
 
 // 判断名称必填
 if (!process.env.NAME) {
-  throw new Error('NAME is must, please use "NAME=test npm run start"!');
+  throw new Error('NAME is must, please use "NAME=test npm run build"!');
 }
 // 判断名称是否不存在
 if (!files.includes(process.env.NAME)) {
@@ -83,19 +83,7 @@ const prodWebpackConfig = merge(baseWebpackConfig, {
     new OptimizeCSSPlugin({
       cssProcessorOptions: { safe: true }
     }),
-    new HtmlWebpackPlugin({
-      filename: config.build.outIndex,
-      template: config.build.index,
-      // template: 'index.html',
-      inject: 'body',
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true
-      },
-      // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency'
-    }),
+    ...utils.setHtmlWebpackPlugin(),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',

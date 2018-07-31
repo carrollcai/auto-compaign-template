@@ -11,7 +11,7 @@ const fs = require('fs');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const baseWebpackConfig = require('./webpack.base.js');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const utils = require('./utils.js');
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT && Number(process.env.PORT);
@@ -80,11 +80,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new HtmlWebpackPlugin({
-      filename: `./src/modules/${process.env.NAME}/index.html`,
-      template: `./src/modules/${process.env.NAME}/index.html`,
-      inject: 'body'
-    }),
+    ...utils.setHtmlWebpackPlugin(),
   ]
 });
 
